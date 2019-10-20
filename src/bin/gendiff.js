@@ -2,7 +2,7 @@
 import fs from 'fs';
 import program from 'commander';
 import { version, description } from '../../package.json';
-import genDiff from "../genDiff";
+import genDiff from '../genDiff';
 
 program
   .version(version)
@@ -15,5 +15,3 @@ program
     console.log(genDiff(firstFile, secondFile));
   })
   .parse(process.argv);
-
-
