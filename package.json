@@ -1,7 +1,7 @@
 {
   "name": "weekends-gendiff",
-  "version": "0.0.0",
-  "description": "Simple CLI utility for comparing two state of file",
+  "version": "0.0.1",
+  "description": "Compares two configuration files and shows a difference.",
   "keywords": [
     "diff",
     "json",
@@ -25,8 +25,9 @@
     "url": "https://github.com/TheAlmightyYudHay/frontend-project-lvl2/issues"
   },
   "homepage": "https://github.com/TheAlmightyYudHay/frontend-project-lvl2#readme",
+  "main": "dist/genDiff.js",
   "bin": {
-    "gendiff": "src/bin/gendiff.js"
+    "gendiff": "dist/bin/gendiff.js"
   },
   "files": [
     "dist"
@@ -44,6 +45,8 @@
     "eslint-plugin-import": "^2.18.2"
   },
   "dependencies": {
+    "commander": "^3.0.2",
+    "lodash": "^4.17.15",
     "readline-sync": "^1.4.10"
   }
 }
