@@ -10,5 +10,8 @@ lint:
 start:
 	npx babel-node src/bin/gendiff.js
 
+test-coverage:
+	npm test -- --coverage
+
 test:
 	npm test
