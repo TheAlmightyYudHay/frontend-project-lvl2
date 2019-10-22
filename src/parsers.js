@@ -17,6 +17,5 @@ export default (filePath) => {
   const fileExtension = path.extname(filePath);
   const fileData = fs.readFileSync(filePath, 'utf-8');
   const fileParser = chooseParser(fileExtension);
-  if (fileExtension === '.ini') console.log(fileData);
   return fileParser(fileData);
 };
