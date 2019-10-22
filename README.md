@@ -7,3 +7,6 @@ A simple CLI utility for comparing two versions of some file.
 
 ## Plain JSON's diff
 [![asciicast](https://asciinema.org/a/CcKSReElB5GuBqNUONqgsP8HA.svg)](https://asciinema.org/a/CcKSReElB5GuBqNUONqgsP8HA)
+
+## Plain YAML's diff
+[![asciicast](https://asciinema.org/a/es9qc2H3Mg5txdkPj0kC0tHQO.svg)](https://asciinema.org/a/es9qc2H3Mg5txdkPj0kC0tHQO)
