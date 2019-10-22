@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import parseFormat from './parsers';
 
 const parseFilesData = (previousFile, actualFile) => {
   const previousFileProcessed = Object.entries(previousFile)
@@ -28,9 +29,9 @@ const renderDiff = (abstractTree) => {
   return `{\n${diffsList}}`;
 };
 
-export default (previousFileRaw, actualFileRaw) => {
-  const previousFileParsed = JSON.parse(previousFileRaw);
-  const actualFileParsed = JSON.parse(actualFileRaw);
+export default (previousFile, actualFile) => {
+  const previousFileParsed = parseFormat(previousFile);
+  const actualFileParsed = parseFormat(actualFile);
   const transitionData = parseFilesData(previousFileParsed, actualFileParsed);
   return renderDiff(transitionData);
 };
