@@ -3,15 +3,14 @@ import fs from 'fs';
 import jsyaml from 'js-yaml';
 import ini from 'ini';
 
-const chooseParser = (extension) => {
-  const formatsParsers = {
-    '.json': (format) => JSON.parse(format),
-    '.yaml': (format) => jsyaml.safeLoad(format),
-    '.yml': (format) => jsyaml.safeLoad(format),
-    '.ini': (format) => ini.parse(format),
-  };
-  return formatsParsers[extension];
+const formatsParsers = {
+  '.json': (format) => JSON.parse(format),
+  '.yaml': (format) => jsyaml.safeLoad(format),
+  '.yml': (format) => jsyaml.safeLoad(format),
+  '.ini': (format) => ini.parse(format),
 };
+
+const chooseParser = (extension) => formatsParsers[extension];
 
 export default (filePath) => {
   const fileExtension = path.extname(filePath);

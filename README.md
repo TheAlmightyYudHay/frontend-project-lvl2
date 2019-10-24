@@ -10,3 +10,6 @@ A simple CLI utility for comparing two versions of some file.
 
 ## Plain YAML's diff
 [![asciicast](https://asciinema.org/a/es9qc2H3Mg5txdkPj0kC0tHQO.svg)](https://asciinema.org/a/es9qc2H3Mg5txdkPj0kC0tHQO)
+
+## Plain INI's diff
+[![asciicast](https://asciinema.org/a/8q7jOaKid5L2AmXEhRKbDTjSk.svg)](https://asciinema.org/a/8q7jOaKid5L2AmXEhRKbDTjSk)
