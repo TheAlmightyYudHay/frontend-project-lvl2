@@ -12,7 +12,7 @@ test.each([['json'], ['yaml'], ['yml'], ['ini']])(
   },
 );
 
-test.each([['json']/* , ['yaml'], ['yml'], ['ini'] */])(
+test.each([['json'], ['yaml'], ['yml'], ['ini']])(
   'should compare two nested %s\'s files',
   (extension) => {
     const previousFile = path.join(__dirname, '/__fixtures__/', `diff1Deep.${extension}`);
