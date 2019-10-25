@@ -9,7 +9,7 @@ const diffRelatedFormats = {
 
 const stringifyObject = (object, depthOffset) => {
   const entries = Object.entries(object).reduce((acc, [key, value]) => (
-    `${acc}${' '.repeat(depthOffset + 4)}${key}: ${!_.isNull(value) && _.isObject(value) ? stringifyObject(value, depthOffset + 4) : value}\n`
+    `${acc}${' '.repeat(depthOffset + 4)}${key}: ${_.isObject(value) ? stringifyObject(value, depthOffset + 4) : value}\n`
   ), '\n');
   return `{${entries}${' '.repeat(depthOffset)}}`;
 };
@@ -18,7 +18,7 @@ const convertPropertyDiffToString = (
   { name, diffStatus: { previous, actual, state } }, depthOffset,
 ) => {
   const [previousFormatted, actualFormatted] = [previous, actual].map((stateValue) => (
-    `${name}: ${!_.isNull(stateValue) && _.isObject(stateValue) ? stringifyObject(stateValue, depthOffset) : stateValue}`
+    `${name}: ${_.isObject(stateValue) ? stringifyObject(stateValue, depthOffset) : stateValue}`
   ));
   const formattingMethod = diffRelatedFormats[state];
   return formattingMethod(previousFormatted, actualFormatted, depthOffset);
