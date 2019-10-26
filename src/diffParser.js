@@ -26,12 +26,13 @@ const parseSettings = (previousFile, actualFile, groupName = null) => {
   const nestedValues = commonNestedProperties.map((key) => (
     parseSettings(previousFile[key], actualFile[key], key)
   ));
-  const transitionDataByPrevious = Object.entries(previousFile).reduce((acc, [key, value]) => {
-    if (commonNestedProperties.includes(key)) return acc;
-    return _.assign({}, acc, { [key]: { previous: value, actual: null } });
-  }, []);
-  const plainValuesRaw = Object.entries(actualFile).reduce((acc, [key, value]) => {
-    if (commonNestedProperties.includes(key)) return acc;
+  const previousFileWithoutCommons = _.omit(previousFile, commonNestedProperties);
+  const actualFileWithoutCommons = _.omit(actualFile, commonNestedProperties);
+  const transitionDataByPrevious = Object.entries(previousFileWithoutCommons).reduce(
+    (acc, [key, value]) => _.assign({}, acc, { [key]: { previous: value, actual: null } }),
+    [],
+  );
+  const plainValuesRaw = Object.entries(actualFileWithoutCommons).reduce((acc, [key, value]) => {
     const previous = _.has(acc, key) ? acc[key].previous : null;
     return _.assign({}, acc, { [key]: { previous, actual: value } });
   }, transitionDataByPrevious);
