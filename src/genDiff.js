@@ -1,10 +1,23 @@
-import parseSettings from './diffParser';
-import parseFormat from './formatParser';
-import renderAsJson from './renderAsJson';
+import path from 'path';
+import fs from 'fs';
+import parseSettings from './parseSettings';
+import parseFormat from './parseFormat';
+import * as formatters from './formatters';
 
-export default (previousFile, actualFile) => {
-  const previousFileParsed = parseFormat(previousFile);
-  const actualFileParsed = parseFormat(actualFile);
-  const transitionData = parseSettings(previousFileParsed, actualFileParsed);
-  return renderAsJson(transitionData);
+const getFileExtensionAndData = (filePath) => {
+  const fileExtension = path.extname(filePath);
+  const fileData = fs.readFileSync(filePath, 'utf-8');
+  return [fileExtension, fileData];
+};
+
+export default (previousSettingsFilePath, actualSettingsFilePath, formatterType) => {
+  const [
+    previousFileExtension, previousFileData,
+  ] = getFileExtensionAndData(previousSettingsFilePath);
+  const [actualFileExtension, actualFileData] = getFileExtensionAndData(actualSettingsFilePath);
+  const previousSettingsParsed = parseFormat(previousFileData, previousFileExtension);
+  const actualSettingsParsed = parseFormat(actualFileData, actualFileExtension);
+  const transitionData = parseSettings(previousSettingsParsed, actualSettingsParsed);
+  const formattingSettingsFiles = formatters[formatterType];
+  return formattingSettingsFiles(transitionData);
 };

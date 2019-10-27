@@ -1,5 +1,3 @@
-import path from 'path';
-import fs from 'fs';
 import jsyaml from 'js-yaml';
 import ini from 'ini';
 
@@ -12,9 +10,7 @@ const formatsParsers = {
 
 const chooseParser = (extension) => formatsParsers[extension];
 
-export default (filePath) => {
-  const fileExtension = path.extname(filePath);
-  const fileData = fs.readFileSync(filePath, 'utf-8');
+export default (fileData, fileExtension) => {
   const fileParser = chooseParser(fileExtension);
   return fileParser(fileData);
 };

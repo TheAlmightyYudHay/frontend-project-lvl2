@@ -19,23 +19,25 @@ const stateMap = [
   },
 ];
 
-const parseSettings = (previousFile, actualFile, groupName = null) => {
-  const commonNestedProperties = _.union(_.keys(previousFile), _.keys(actualFile)).filter((key) => (
-    _.isObject(previousFile[key]) && _.isObject(actualFile[key])
-  ));
+const parseSettings = (previousSettings, actualSettings, groupName = '') => {
+  const commonNestedProperties = _.union(_.keys(previousSettings), _.keys(actualSettings))
+    .filter((key) => (
+      _.isObject(previousSettings[key]) && _.isObject(actualSettings[key])
+    ));
   const nestedValues = commonNestedProperties.map((key) => (
-    parseSettings(previousFile[key], actualFile[key], key)
+    parseSettings(previousSettings[key], actualSettings[key], key)
   ));
-  const previousFileWithoutCommons = _.omit(previousFile, commonNestedProperties);
-  const actualFileWithoutCommons = _.omit(actualFile, commonNestedProperties);
-  const transitionDataByPrevious = Object.entries(previousFileWithoutCommons).reduce(
+  const previousSettingsWithoutCommons = _.omit(previousSettings, commonNestedProperties);
+  const actualSettingsWithoutCommons = _.omit(actualSettings, commonNestedProperties);
+  const transitionDataByPrevious = Object.entries(previousSettingsWithoutCommons).reduce(
     (acc, [key, value]) => _.assign({}, acc, { [key]: { previous: value, actual: null } }),
     [],
   );
-  const plainValuesRaw = Object.entries(actualFileWithoutCommons).reduce((acc, [key, value]) => {
-    const previous = _.has(acc, key) ? acc[key].previous : null;
-    return _.assign({}, acc, { [key]: { previous, actual: value } });
-  }, transitionDataByPrevious);
+  const plainValuesRaw = Object.entries(actualSettingsWithoutCommons)
+    .reduce((acc, [key, value]) => {
+      const previous = _.has(acc, key) ? acc[key].previous : null;
+      return _.assign({}, acc, { [key]: { previous, actual: value } });
+    }, transitionDataByPrevious);
   const plainValues = Object.entries(plainValuesRaw).map(([key, { previous, actual }]) => {
     const state = stateMap.find((stateItem) => stateItem.check(previous, actual)).name;
     return { name: key, diffStatus: { previous, actual, state } };

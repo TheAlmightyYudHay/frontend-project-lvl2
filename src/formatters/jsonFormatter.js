@@ -24,13 +24,13 @@ const convertPropertyDiffToString = (
   return formattingMethod(previousFormatted, actualFormatted, depthOffset);
 };
 
-const renderAsJson = ({ groupName, nestedValues, plainValues }, depthOffset = 4) => {
+const jsonFormatter = ({ groupName, nestedValues, plainValues }, depthOffset = 4) => {
   const plainValuesFormatted = plainValues.reduce((acc, diffOptions) => (
     `${acc}${convertPropertyDiffToString(diffOptions, depthOffset)}`
   ), '');
-  const nestedValuesFormatted = nestedValues.reduce((acc, nestedSettingsChild) => `${acc}\n${' '.repeat(depthOffset)}${renderAsJson(nestedSettingsChild, depthOffset + 4)}`, '');
-  const groupNameFormatted = _.isNull(groupName) ? '' : `${groupName}: `;
+  const nestedValuesFormatted = nestedValues.reduce((acc, nestedSettingsChild) => `${acc}\n${' '.repeat(depthOffset)}${jsonFormatter(nestedSettingsChild, depthOffset + 4)}`, '');
+  const groupNameFormatted = groupName === '' ? groupName : `${groupName}: `;
   return `${groupNameFormatted}{${nestedValuesFormatted}${plainValuesFormatted}\n${' '.repeat(depthOffset - 4)}}`;
 };
 
-export default renderAsJson;
+export default jsonFormatter;
