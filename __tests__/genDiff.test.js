@@ -1,15 +1,22 @@
+import fs from 'fs';
 import path from 'path';
 import plainDiff from './__fixtures__/plainDiff';
 import deepDiff from './__fixtures__/deepDiff';
 import deepDiffPlain from './__fixtures__/deepDiffPlain';
 import genDiff from '../src/genDiff';
 
+let deepDiffJson;
+
+beforeAll(() => {
+  deepDiffJson = JSON.parse(fs.readFileSync(path.join(__dirname, '/__fixtures__/', 'deepDiffJson.json')));
+});
+
 test.each([['json'], ['yaml'], ['yml'], ['ini']])(
   'should compare two plain %s\'s files',
   (extension) => {
     const previousSettings = path.join(__dirname, '/__fixtures__/', `diff1Plain.${extension}`);
     const actualSettings = path.join(__dirname, '/__fixtures__/', `diff2Plain.${extension}`);
-    expect(genDiff(previousSettings, actualSettings, 'json')).toBe(plainDiff);
+    expect(genDiff(previousSettings, actualSettings, 'object')).toBe(plainDiff);
   },
 );
 
@@ -18,7 +25,7 @@ test.each([['json'], ['yaml'], ['yml'], ['ini']])(
   (extension) => {
     const previousSettings = path.join(__dirname, '/__fixtures__/', `diff1Deep.${extension}`);
     const actualSettings = path.join(__dirname, '/__fixtures__/', `diff2Deep.${extension}`);
-    expect(genDiff(previousSettings, actualSettings, 'json')).toBe(deepDiff);
+    expect(genDiff(previousSettings, actualSettings, 'object')).toBe(deepDiff);
   },
 );
 
@@ -28,5 +35,14 @@ test.each([['json'], ['yaml'], ['yml'], ['ini']])(
     const previousSettings = path.join(__dirname, '/__fixtures__/', `diff1Deep.${extension}`);
     const actualSettings = path.join(__dirname, '/__fixtures__/', `diff2Deep.${extension}`);
     expect(genDiff(previousSettings, actualSettings, 'plain')).toBe(deepDiffPlain);
+  },
+);
+
+test.each([['json'], ['yaml'], ['yml'], ['ini']])(
+  'should compare two nested %s\'s files in json',
+  (extension) => {
+    const previousSettings = path.join(__dirname, '/__fixtures__/', `diff1Deep.${extension}`);
+    const actualSettings = path.join(__dirname, '/__fixtures__/', `diff2Deep.${extension}`);
+    expect(JSON.parse(genDiff(previousSettings, actualSettings, 'json'))).toEqual(deepDiffJson);
   },
 );

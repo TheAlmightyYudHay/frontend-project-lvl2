@@ -2,45 +2,39 @@ import _ from 'lodash';
 
 const stateMap = [
   {
-    name: 'added',
-    check: (previous, actual) => _.isNull(previous) && !_.isNull(actual),
+    check: (previous, actual) => _.isUndefined(previous) && !_.isUndefined(actual),
+    stateHandle: (previous, actual) => ({ actual, state: 'added' }),
   },
   {
-    name: 'deleted',
-    check: (previous, actual) => !_.isNull(previous) && _.isNull(actual),
+    check: (previous, actual) => !_.isUndefined(previous) && _.isUndefined(actual),
+    stateHandle: (previous) => ({ previous, state: 'deleted' }),
   },
   {
-    name: 'changed',
     check: (previous, actual) => !_.isEqual(previous, actual),
+    stateHandle: (previous, actual) => ({ previous, actual, state: 'changed' }),
   },
   {
-    name: 'unchanged',
     check: (previous, actual) => _.isEqual(previous, actual),
+    stateHandle: (previous) => ({ value: previous, state: 'unchanged' }),
   },
 ];
 
 const parseSettings = (previousSettings, actualSettings, groupName = '') => {
-  const commonNestedProperties = _.union(_.keys(previousSettings), _.keys(actualSettings))
-    .filter((key) => (
-      _.isObject(previousSettings[key]) && _.isObject(actualSettings[key])
-    ));
+  const commonProperties = _.intersection(_.keys(previousSettings), _.keys(actualSettings));
+  const commonNestedProperties = commonProperties.filter((key) => (
+    _.isObject(previousSettings[key]) && _.isObject(actualSettings[key])
+  ));
   const nestedValues = commonNestedProperties.map((key) => (
     parseSettings(previousSettings[key], actualSettings[key], key)
   ));
-  const previousSettingsWithoutCommons = _.omit(previousSettings, commonNestedProperties);
-  const actualSettingsWithoutCommons = _.omit(actualSettings, commonNestedProperties);
-  const transitionDataByPrevious = Object.entries(previousSettingsWithoutCommons).reduce(
-    (acc, [key, value]) => _.assign({}, acc, { [key]: { previous: value, actual: null } }),
-    [],
-  );
-  const plainValuesRaw = Object.entries(actualSettingsWithoutCommons)
-    .reduce((acc, [key, value]) => {
-      const previous = _.has(acc, key) ? acc[key].previous : null;
-      return _.assign({}, acc, { [key]: { previous, actual: value } });
-    }, transitionDataByPrevious);
-  const plainValues = Object.entries(plainValuesRaw).map(([key, { previous, actual }]) => {
-    const state = stateMap.find((stateItem) => stateItem.check(previous, actual)).name;
-    return { name: key, diffStatus: { previous, actual, state } };
+  const allProperties = _.union(_.keys(previousSettings), _.keys(actualSettings));
+  const plainProperties = _.difference(allProperties, commonNestedProperties);
+  const plainValues = plainProperties.map((key) => {
+    const previous = previousSettings[key];
+    const actual = actualSettings[key];
+    const { stateHandle } = stateMap.find((stateItem) => stateItem.check(previous, actual));
+    const diffStatus = stateHandle(previous, actual);
+    return { name: key, diffStatus };
   });
   return { groupName, nestedValues, plainValues };
 };

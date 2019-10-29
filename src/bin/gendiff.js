@@ -6,7 +6,7 @@ import genDiff from '../genDiff';
 program
   .version(version)
   .description(description)
-  .option('-f, --format [type]', 'output format', 'json')
+  .option('-f, --format [type]', 'output format', 'object')
   .arguments('<firstConfig> <secondConfig>')
   .action((firstConfig, secondConfig) => {
     console.log(genDiff(firstConfig, secondConfig, program.format));

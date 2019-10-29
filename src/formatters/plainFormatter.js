@@ -1,9 +1,9 @@
 import _ from 'lodash';
 
 const diffRelatedFormats = {
-  added: (name, nestingChain, actual) => `Property '${nestingChain}${name}' was added with value: ${actual}`,
+  added: (name, nestingChain, { actual }) => `Property '${nestingChain}${name}' was added with value: ${actual}`,
   deleted: (name, nestingChain) => `Property '${nestingChain}${name}' was removed`,
-  changed: (name, nestingChain, actual, previous) => `Property '${nestingChain}${name}' was updated. From ${previous} to ${actual}`,
+  changed: (name, nestingChain, { actual, previous }) => `Property '${nestingChain}${name}' was updated. From ${previous} to ${actual}`,
 };
 
 const typeMapping = [
@@ -31,12 +31,13 @@ const convertValueByType = (value) => {
 };
 
 const convertPropertyDiffToString = (
-  { name, diffStatus: { previous, actual, state } }, nestingChain,
+  { name, diffStatus: { state, ...restDiffOptions } }, nestingChain,
 ) => {
-  const previousFormatted = convertValueByType(previous);
-  const actualFormatted = convertValueByType(actual);
+  const restDiffOptionsFormatted = Object.entries(restDiffOptions).reduce((acc, [key, value]) => (
+    { ...acc, [key]: convertValueByType(value) }
+  ), {});
   const formattingMethod = diffRelatedFormats[state];
-  return formattingMethod(name, nestingChain, actualFormatted, previousFormatted);
+  return formattingMethod(name, nestingChain, restDiffOptionsFormatted);
 };
 
 const plainFormatter = ({ nestedValues, plainValues }, nestingChain = '') => {

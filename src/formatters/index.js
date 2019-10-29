@@ -1,4 +1,5 @@
-import jsonFormatter from './jsonFormatter';
+import objectFormatter from './objectFormatter';
 import plainFormatter from './plainFormatter';
+import jsonFormatter from './jsonFormatter';
 
-export { jsonFormatter as json, plainFormatter as plain };
+export { objectFormatter as object, plainFormatter as plain, jsonFormatter as json };
