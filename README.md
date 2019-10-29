@@ -13,3 +13,12 @@ A simple CLI utility for comparing two versions of some file.
 
 ## Plain INI's diff
 [![asciicast](https://asciinema.org/a/8q7jOaKid5L2AmXEhRKbDTjSk.svg)](https://asciinema.org/a/8q7jOaKid5L2AmXEhRKbDTjSk)
+
+## Deep diff
+[![asciicast](https://asciinema.org/a/eAEZ9r5yxLnjY8tyYJblN1hCl.svg)](https://asciinema.org/a/eAEZ9r5yxLnjY8tyYJblN1hCl)
+
+## Deep diff in plain format
+[![asciicast](https://asciinema.org/a/4d2AIjOIJuDCCdCwS6KpvQDBj.svg)](https://asciinema.org/a/4d2AIjOIJuDCCdCwS6KpvQDBj)
+
+## Diff in JSON format
+[![asciicast](https://asciinema.org/a/5QzHVxbhh9Eey0VNYH9Fj8Phn.svg)](https://asciinema.org/a/5QzHVxbhh9Eey0VNYH9Fj8Phn)
