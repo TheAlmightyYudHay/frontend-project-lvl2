@@ -1,48 +1,28 @@
-import fs from 'fs';
 import path from 'path';
-import plainDiff from './__fixtures__/plainDiff';
-import deepDiff from './__fixtures__/deepDiff';
-import deepDiffPlain from './__fixtures__/deepDiffPlain';
-import genDiff from '../src/genDiff';
+// Урок прошел, код сократил, но с помеченными импортами так и не понял, что можно сделать :(
+import plainDiff from '../__fixtures__/plainDiff';
+import deepDiff from '../__fixtures__/deepDiff';
+import deepDiffPlain from '../__fixtures__/deepDiffPlain';
+import deepDiffJson from '../__fixtures__/deepDiffJson';
+import genDiff from '../src';
 
-let deepDiffJson;
+const getDiffFixturesPath = (fileTypePrefix, fileExtension) => [
+  path.join(__dirname, '..', '/__fixtures__/', `diff1${fileTypePrefix}.${fileExtension}`),
+  path.join(__dirname, '..', '/__fixtures__/', `diff2${fileTypePrefix}.${fileExtension}`),
+];
+const createFormats = (fileTypePrefix, diffFormat, diffExpected) => ['json', 'yaml', 'yml', 'ini'].map((format) => [fileTypePrefix, format, diffFormat, diffExpected]);
 
-beforeAll(() => {
-  deepDiffJson = JSON.parse(fs.readFileSync(path.join(__dirname, '/__fixtures__/', 'deepDiffJson.json')));
-});
-
-test.each([['json'], ['yaml'], ['yml'], ['ini']])(
-  'should compare two plain %s\'s files',
-  (extension) => {
-    const previousSettings = path.join(__dirname, '/__fixtures__/', `diff1Plain.${extension}`);
-    const actualSettings = path.join(__dirname, '/__fixtures__/', `diff2Plain.${extension}`);
-    expect(genDiff(previousSettings, actualSettings, 'object')).toBe(plainDiff);
-  },
-);
-
-test.each([['json'], ['yaml'], ['yml'], ['ini']])(
-  'should compare two nested %s\'s files',
-  (extension) => {
-    const previousSettings = path.join(__dirname, '/__fixtures__/', `diff1Deep.${extension}`);
-    const actualSettings = path.join(__dirname, '/__fixtures__/', `diff2Deep.${extension}`);
-    expect(genDiff(previousSettings, actualSettings, 'object')).toBe(deepDiff);
-  },
-);
-
-test.each([['json'], ['yaml'], ['yml'], ['ini']])(
-  'should compare two nested %s\'s files in plain format',
-  (extension) => {
-    const previousSettings = path.join(__dirname, '/__fixtures__/', `diff1Deep.${extension}`);
-    const actualSettings = path.join(__dirname, '/__fixtures__/', `diff2Deep.${extension}`);
-    expect(genDiff(previousSettings, actualSettings, 'plain')).toBe(deepDiffPlain);
-  },
-);
-
-test.each([['json'], ['yaml'], ['yml'], ['ini']])(
-  'should compare two nested %s\'s files in json',
-  (extension) => {
-    const previousSettings = path.join(__dirname, '/__fixtures__/', `diff1Deep.${extension}`);
-    const actualSettings = path.join(__dirname, '/__fixtures__/', `diff2Deep.${extension}`);
-    expect(JSON.parse(genDiff(previousSettings, actualSettings, 'json'))).toEqual(deepDiffJson);
+test.each([
+  ...createFormats('Plain', 'object', plainDiff),
+  ...createFormats('Deep', 'object', deepDiff),
+  ...createFormats('Deep', 'plain', deepDiffPlain),
+  ...createFormats('Deep', 'json', deepDiffJson),
+])(
+  'should compare two %s %s\'s files in %s format',
+  (fileTypePrefix, extension, diffFormat, diffExpected) => {
+    const [
+      previousSettingsPath, actualSettingsPath,
+    ] = getDiffFixturesPath(fileTypePrefix, extension);
+    expect(genDiff(previousSettingsPath, actualSettingsPath, diffFormat)).toBe(diffExpected);
   },
 );

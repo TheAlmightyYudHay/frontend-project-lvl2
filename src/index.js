@@ -6,17 +6,18 @@ import * as formatters from './formatters';
 
 const getFileExtensionAndData = (filePath) => {
   const fileExtension = path.extname(filePath);
+  const fileType = fileExtension.slice(1);
   const fileData = fs.readFileSync(filePath, 'utf-8');
-  return [fileExtension, fileData];
+  return [fileType, fileData];
 };
 
 export default (previousSettingsFilePath, actualSettingsFilePath, formatterType) => {
   const [
-    previousFileExtension, previousFileData,
+    previousFileType, previousFileData,
   ] = getFileExtensionAndData(previousSettingsFilePath);
-  const [actualFileExtension, actualFileData] = getFileExtensionAndData(actualSettingsFilePath);
-  const previousSettingsParsed = parseFormat(previousFileData, previousFileExtension);
-  const actualSettingsParsed = parseFormat(actualFileData, actualFileExtension);
+  const [actualFileType, actualFileData] = getFileExtensionAndData(actualSettingsFilePath);
+  const previousSettingsParsed = parseFormat(previousFileData, previousFileType);
+  const actualSettingsParsed = parseFormat(actualFileData, actualFileType);
   const transitionData = parseSettings(previousSettingsParsed, actualSettingsParsed);
   const formattingSettingsFiles = formatters[formatterType];
   return formattingSettingsFiles(transitionData);
