@@ -4,7 +4,7 @@ import parseSettings from './parseSettings';
 import parseFormat from './parseFormat';
 import * as formatters from './formatters';
 
-const getFileExtensionAndData = (filePath) => {
+const getFileTypeAndData = (filePath) => {
   const fileExtension = path.extname(filePath);
   const fileType = fileExtension.slice(1);
   const fileData = fs.readFileSync(filePath, 'utf-8');
@@ -14,8 +14,8 @@ const getFileExtensionAndData = (filePath) => {
 export default (previousSettingsFilePath, actualSettingsFilePath, formatterType) => {
   const [
     previousFileType, previousFileData,
-  ] = getFileExtensionAndData(previousSettingsFilePath);
-  const [actualFileType, actualFileData] = getFileExtensionAndData(actualSettingsFilePath);
+  ] = getFileTypeAndData(previousSettingsFilePath);
+  const [actualFileType, actualFileData] = getFileTypeAndData(actualSettingsFilePath);
   const previousSettingsParsed = parseFormat(previousFileData, previousFileType);
   const actualSettingsParsed = parseFormat(actualFileData, actualFileType);
   const transitionData = parseSettings(previousSettingsParsed, actualSettingsParsed);
