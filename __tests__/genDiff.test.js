@@ -1,28 +1,26 @@
 import path from 'path';
-// Урок прошел, код сократил, но с помеченными импортами так и не понял, что можно сделать :(
-import plainDiff from '../__fixtures__/plainDiff';
-import deepDiff from '../__fixtures__/deepDiff';
-import deepDiffPlain from '../__fixtures__/deepDiffPlain';
-import deepDiffJson from '../__fixtures__/deepDiffJson';
+import fs from 'fs';
 import genDiff from '../src';
 
-const getDiffFixturesPath = (fileTypePrefix, fileExtension) => [
-  path.join(__dirname, '..', '/__fixtures__/', `diff1${fileTypePrefix}.${fileExtension}`),
-  path.join(__dirname, '..', '/__fixtures__/', `diff2${fileTypePrefix}.${fileExtension}`),
-];
-const createFormats = (fileTypePrefix, diffFormat, diffExpected) => ['json', 'yaml', 'yml', 'ini'].map((format) => [fileTypePrefix, format, diffFormat, diffExpected]);
+const getFixturePath = (name) => path.join(__dirname, '..', '/__fixtures__/', name);
 
-test.each([
-  ...createFormats('Plain', 'object', plainDiff),
-  ...createFormats('Deep', 'object', deepDiff),
-  ...createFormats('Deep', 'plain', deepDiffPlain),
-  ...createFormats('Deep', 'json', deepDiffJson),
-])(
-  'should compare two %s %s\'s files in %s format',
-  (fileTypePrefix, extension, diffFormat, diffExpected) => {
-    const [
-      previousSettingsPath, actualSettingsPath,
-    ] = getDiffFixturesPath(fileTypePrefix, extension);
-    expect(genDiff(previousSettingsPath, actualSettingsPath, diffFormat)).toBe(diffExpected);
+const formats = ['json', 'yaml', 'yml', 'ini'];
+
+const deepDiffPlain = fs.readFileSync(getFixturePath('deepDiffPlain.txt'), 'utf-8').trim();
+const deepDiffJson = fs.readFileSync(getFixturePath('deepDiffJson.txt'), 'utf-8').trim();
+const deepDiff = fs.readFileSync(getFixturePath('deepDiff.txt'), 'utf-8').trim();
+const plainDiff = fs.readFileSync(getFixturePath('plainDiff.txt'), 'utf-8').trim();
+
+describe.each(formats)(
+  'should compare two %s\'s files',
+  (format) => {
+    test.each([['Plain', 'object', plainDiff], ['Deep', 'object', deepDiff], ['Deep', 'plain', deepDiffPlain], ['Deep', 'json', deepDiffJson]])(
+      'should compare two %s files in %s format',
+      (fileTypeSuffix, fileFormat, expected) => {
+        const previousSettings = getFixturePath(`diff1${fileTypeSuffix}.${format}`);
+        const actualSettings = getFixturePath(`diff2${fileTypeSuffix}.${format}`);
+        expect(genDiff(previousSettings, actualSettings, fileFormat)).toBe(expected);
+      },
+    );
   },
 );
