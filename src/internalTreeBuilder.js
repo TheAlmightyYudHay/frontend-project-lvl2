@@ -19,24 +19,19 @@ const stateMap = [
   },
 ];
 
-const parseSettings = (previousSettings, actualSettings, groupName = '') => {
-  const commonProperties = _.intersection(_.keys(previousSettings), _.keys(actualSettings));
-  const commonNestedProperties = commonProperties.filter((key) => (
-    _.isObject(previousSettings[key]) && _.isObject(actualSettings[key])
-  ));
-  const nestedValues = commonNestedProperties.map((key) => (
-    parseSettings(previousSettings[key], actualSettings[key], key)
-  ));
+const internalTreeBuilder = (previousSettings, actualSettings, groupName = '') => {
   const allProperties = _.union(_.keys(previousSettings), _.keys(actualSettings));
-  const plainProperties = _.difference(allProperties, commonNestedProperties);
-  const plainValues = plainProperties.map((key) => {
+  const [nestedValues, plainValues] = allProperties.reduce(([nested, plain], key) => {
     const previous = previousSettings[key];
     const actual = actualSettings[key];
+    if (_.isObject(previous) && _.isObject(actual)) {
+      return [[...nested, internalTreeBuilder(previous, actual, key)], plain];
+    }
     const { stateHandle } = stateMap.find((stateItem) => stateItem.check(previous, actual));
     const diffStatus = stateHandle(previous, actual);
-    return { name: key, diffStatus };
-  });
+    return [nested, [...plain, { name: key, diffStatus }]];
+  }, [[], []]);
   return { groupName, nestedValues, plainValues };
 };
 
-export default parseSettings;
+export default internalTreeBuilder;
