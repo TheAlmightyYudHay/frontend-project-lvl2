@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import internalTreeBuilder from './internalTreeBuilder';
 import parseFormat from './formatParser';
-import * as formatters from './formatters';
+import chooseFormatter from './formatters';
 
 const getFileTypeAndData = (filePath) => {
   const fileExtension = path.extname(filePath);
@@ -19,6 +19,6 @@ export default (previousSettingsFilePath, actualSettingsFilePath, formatterType)
   const previousSettingsParsed = parseFormat(previousFileData, previousFileType);
   const actualSettingsParsed = parseFormat(actualFileData, actualFileType);
   const transitionData = internalTreeBuilder(previousSettingsParsed, actualSettingsParsed);
-  const formattingSettingsFiles = formatters[formatterType];
-  return formattingSettingsFiles(transitionData);
+  const formatSettings = chooseFormatter(formatterType);
+  return formatSettings(transitionData);
 };

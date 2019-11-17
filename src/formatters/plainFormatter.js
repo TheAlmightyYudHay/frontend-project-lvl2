@@ -1,54 +1,22 @@
 import _ from 'lodash';
 
-const diffRelatedFormats = {
-  added: (name, nestingChain, { actual }) => `Property '${nestingChain}${name}' was added with value: ${actual}`,
-  deleted: (name, nestingChain) => `Property '${nestingChain}${name}' was removed`,
-  changed: (name, nestingChain, { actual, previous }) => `Property '${nestingChain}${name}' was updated. From ${previous} to ${actual}`,
-};
-
-const typeMapping = [
-  {
-    converting: (value) => value,
-    check: (value) => typeof value === 'number',
-  },
-  {
-    converting: (value) => `'${value}'`,
-    check: (value) => typeof value === 'string',
-  },
-  {
-    converting: () => '[complex value]',
-    check: (value) => typeof value === 'object',
-  },
-  {
-    converting: (value) => value,
-    check: (value) => typeof value === 'boolean',
-  },
-];
-
 const convertValueByType = (value) => {
-  const { converting } = typeMapping.find(({ check }) => check(value));
-  return converting(value);
+  if (typeof value === 'object') return '[complex value]';
+  if (typeof value === 'string') return `'${value}'`;
+  return value;
 };
 
-const convertPropertyDiffToString = (
-  { name, diffStatus: { state, ...restDiffOptions } }, nestingChain,
-) => {
-  const restDiffOptionsFormatted = Object.entries(restDiffOptions).reduce((acc, [key, value]) => (
-    { ...acc, [key]: convertValueByType(value) }
-  ), {});
-  const formattingMethod = diffRelatedFormats[state];
-  return formattingMethod(name, nestingChain, restDiffOptionsFormatted);
+const diffRelatedFormats = {
+  added: ({ name, actual }, nestingChain) => `Property '${nestingChain}${name}' was added with value: ${convertValueByType(actual)}\n`,
+  deleted: ({ name }, nestingChain) => `Property '${nestingChain}${name}' was removed\n`,
+  changed: ({ name, actual, previous }, nestingChain) => `Property '${nestingChain}${name}' was updated. From ${convertValueByType(previous)} to ${convertValueByType(actual)}\n`,
+  unchanged: () => '',
+  nested: (node, nestingChain, handleFn) => `${handleFn(node, `${nestingChain}${node.name}.`)}\n`,
 };
 
-const plainFormatter = ({ nestedValues, plainValues }, nestingChain = '') => {
-  const plainValuesWithoutUnchanged = plainValues.filter(({ diffStatus: { state } }) => state !== 'unchanged');
-  const plainValuesFormatted = plainValuesWithoutUnchanged.reduce((acc, diffOptions) => `${acc}${convertPropertyDiffToString(diffOptions, nestingChain)}\n`, '');
-  const nestedValuesFormatted = nestedValues.reduce((acc, nestedItem) => {
-    const { groupName } = nestedItem;
-    const newNestingChain = nestingChain === '' ? `${groupName}.` : `${nestingChain}${groupName}.`;
-    return `${acc}${plainFormatter(nestedItem, `${newNestingChain}`)}\n`;
-  }, '');
-  return _.trimEnd(`${nestedValuesFormatted}${plainValuesFormatted}`);
+const plainFormatter = ({ children }, nestingChain = '') => {
+  const childrenFormatted = children.reduce((acc, node) => `${acc}${diffRelatedFormats[node.type](node, nestingChain, plainFormatter)}`, '');
+  return _.trimEnd(`${childrenFormatted}`);
 };
 
 export default plainFormatter;
