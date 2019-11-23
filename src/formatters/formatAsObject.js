@@ -1,6 +1,6 @@
-const stringify = (sign, depthOffset) => {
-  if (typeof sign !== 'object') return sign;
-  const formattedEntries = Object.entries(sign)
+const stringify = (property, depthOffset) => {
+  if (typeof property !== 'object') return property;
+  const formattedEntries = Object.entries(property)
     .map(([key, value]) => {
       const formattedValue = stringify(value, depthOffset + 4);
       return `${' '.repeat(depthOffset)}${key}: ${formattedValue}`;
@@ -9,11 +9,16 @@ const stringify = (sign, depthOffset) => {
   return `{\n${formattedEntries}\n${' '.repeat(depthOffset - 4)}}`;
 };
 
+const buildLine = (name, value, depthOffset, sign) => {
+  const prefix = sign ? `${' '.repeat(depthOffset - 2)}${sign} ` : `${' '.repeat(depthOffset)}`;
+  return `${prefix}${name}: ${stringify(value, depthOffset + 4)}`;
+};
+
 const diffRelatedFormats = {
-  unchanged: ({ name, actual }, depthOffset) => `${' '.repeat(depthOffset)}${name}: ${stringify(actual, depthOffset + 4)}`,
-  added: ({ name, actual }, depthOffset) => `${' '.repeat(depthOffset - 2)}+ ${name}: ${stringify(actual, depthOffset + 4)}`,
-  deleted: ({ name, previous }, depthOffset) => `${' '.repeat(depthOffset - 2)}- ${name}: ${stringify(previous, depthOffset + 4)}`,
-  changed: ({ name, previous, actual }, depthOffset) => `${' '.repeat(depthOffset - 2)}+ ${name}: ${stringify(actual, depthOffset + 4)}\n${' '.repeat(depthOffset - 2)}- ${name}: ${stringify(previous, depthOffset + 4)}`,
+  unchanged: ({ name, actual }, depthOffset) => buildLine(name, actual, depthOffset, null),
+  added: ({ name, actual }, depthOffset) => buildLine(name, actual, depthOffset, '+'),
+  deleted: ({ name, previous }, depthOffset) => buildLine(name, previous, depthOffset, '-'),
+  changed: ({ name, previous, actual }, depthOffset) => `${buildLine(name, actual, depthOffset, '+')}\n${buildLine(name, previous, depthOffset, '-')}`,
   nested: (node, depthOffset, handleFn) => handleFn(node, depthOffset),
 };
 
