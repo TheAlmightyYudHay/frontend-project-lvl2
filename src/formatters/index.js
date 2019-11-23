@@ -1,11 +1,11 @@
-import objectFormatter from './objectFormatter';
-import plainFormatter from './plainFormatter';
-import jsonFormatter from './jsonFormatter';
+import formatAsObject from './formatAsObject';
+import formatAsPlain from './formatAsPlain';
+import jsonFormatter from './formatAsJson';
 
 const formatters = {
-  object: objectFormatter,
+  object: formatAsObject,
   json: jsonFormatter,
-  plain: plainFormatter,
+  plain: formatAsPlain,
 };
 
 export default (formatterType) => formatters[formatterType];

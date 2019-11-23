@@ -24,19 +24,19 @@ const stateMap = [
   {
     type: 'unchanged',
     check: (previous, actual) => _.isEqual(previous, actual),
-    handleOptions: (previous) => ({ value: previous }),
+    handleOptions: (previous, actual) => ({ previous, actual }),
   },
 ];
 
-const internalTreeBuilder = (previousSettings, actualSettings) => {
+const buildInternalTree = (previousSettings, actualSettings) => {
   const allProperties = _.union(_.keys(previousSettings), _.keys(actualSettings));
   const children = allProperties.map((key) => {
     const previous = previousSettings[key];
     const actual = actualSettings[key];
     const { handleOptions, type } = stateMap.find((stateItem) => stateItem.check(previous, actual));
-    return { name: key, type, ...handleOptions(previous, actual, internalTreeBuilder) };
+    return { name: key, type, ...handleOptions(previous, actual, buildInternalTree) };
   });
   return { type: 'nested', children };
 };
 
-export default internalTreeBuilder;
+export default buildInternalTree;
