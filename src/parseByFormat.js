@@ -9,6 +9,6 @@ const formatsParsers = {
 };
 
 export default (dataToParse, dataType) => {
-  const dataParser = formatsParsers[dataType];
-  return dataParser(dataToParse);
+  const parseData = formatsParsers[dataType];
+  return parseData(dataToParse);
 };

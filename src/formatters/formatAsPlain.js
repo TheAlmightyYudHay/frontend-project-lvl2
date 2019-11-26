@@ -5,9 +5,9 @@ const convertValueByType = (value) => {
 };
 
 const diffRelatedFormats = {
-  added: ({ name, actual }, ancestry) => `Property '${ancestry}${name}' was added with value: ${convertValueByType(actual)}`,
+  added: ({ name, value: { actual } }, ancestry) => `Property '${ancestry}${name}' was added with value: ${convertValueByType(actual)}`,
   deleted: ({ name }, ancestry) => `Property '${ancestry}${name}' was removed`,
-  changed: ({ name, actual, previous }, ancestry) => `Property '${ancestry}${name}' was updated. From ${convertValueByType(previous)} to ${convertValueByType(actual)}`,
+  changed: ({ name, value: { actual, previous } }, ancestry) => `Property '${ancestry}${name}' was updated. From ${convertValueByType(previous)} to ${convertValueByType(actual)}`,
   unchanged: () => null,
   nested: (node, ancestry, handleFn) => `${handleFn(node, `${ancestry}${node.name}.`)}`,
 };

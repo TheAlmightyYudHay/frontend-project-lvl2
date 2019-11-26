@@ -9,22 +9,22 @@ const stateMap = [
   {
     type: 'added',
     check: (previous, actual) => _.isUndefined(previous) && !_.isUndefined(actual),
-    handleOptions: (previous, actual) => ({ actual }),
+    handleOptions: (previous, actual) => ({ value: { actual } }),
   },
   {
     type: 'deleted',
     check: (previous, actual) => !_.isUndefined(previous) && _.isUndefined(actual),
-    handleOptions: (previous) => ({ previous }),
+    handleOptions: (previous) => ({ value: { previous } }),
   },
   {
     type: 'changed',
     check: (previous, actual) => !_.isEqual(previous, actual),
-    handleOptions: (previous, actual) => ({ previous, actual }),
+    handleOptions: (previous, actual) => ({ value: { previous, actual } }),
   },
   {
     type: 'unchanged',
     check: (previous, actual) => _.isEqual(previous, actual),
-    handleOptions: (previous, actual) => ({ previous, actual }),
+    handleOptions: (previous, actual) => ({ value: { previous, actual } }),
   },
 ];
 
