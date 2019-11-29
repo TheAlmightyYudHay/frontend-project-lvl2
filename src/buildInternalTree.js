@@ -4,39 +4,46 @@ const stateMap = [
   {
     type: 'nested',
     check: (previous, actual) => _.isObject(previous) && _.isObject(actual),
-    handleOptions: (previous, actual, builderFn) => builderFn(previous, actual),
+    handleOptions: (name, previous, actual, builderFn) => ({
+      name,
+      type: 'nested',
+      children: builderFn(previous, actual),
+    }),
   },
   {
     type: 'added',
     check: (previous, actual) => _.isUndefined(previous) && !_.isUndefined(actual),
-    handleOptions: (previous, actual) => ({ value: { actual } }),
+    handleOptions: (name, previous, actual) => ({ name, type: 'added', actual }),
   },
   {
     type: 'deleted',
     check: (previous, actual) => !_.isUndefined(previous) && _.isUndefined(actual),
-    handleOptions: (previous) => ({ value: { previous } }),
+    handleOptions: (name, previous) => ({ name, type: 'deleted', previous }),
   },
   {
     type: 'changed',
     check: (previous, actual) => !_.isEqual(previous, actual),
-    handleOptions: (previous, actual) => ({ value: { previous, actual } }),
+    handleOptions: (name, previous, actual) => ({
+      name, type: 'changed', previous, actual,
+    }),
   },
   {
     type: 'unchanged',
     check: (previous, actual) => _.isEqual(previous, actual),
-    handleOptions: (previous, actual) => ({ value: { previous, actual } }),
+    handleOptions: (name, previous, actual) => ({
+      name, type: 'unchanged', previous, actual,
+    }),
   },
 ];
 
 const buildInternalTree = (previousSettings, actualSettings) => {
   const allProperties = _.union(_.keys(previousSettings), _.keys(actualSettings));
-  const children = allProperties.map((key) => {
+  return allProperties.map((key) => {
     const previous = previousSettings[key];
     const actual = actualSettings[key];
-    const { handleOptions, type } = stateMap.find((stateItem) => stateItem.check(previous, actual));
-    return { name: key, type, ...handleOptions(previous, actual, buildInternalTree) };
+    const { handleOptions } = stateMap.find((stateItem) => stateItem.check(previous, actual));
+    return handleOptions(key, previous, actual, buildInternalTree);
   });
-  return { type: 'nested', children };
 };
 
 export default buildInternalTree;

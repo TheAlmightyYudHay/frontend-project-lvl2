@@ -5,14 +5,14 @@ const convertValueByType = (value) => {
 };
 
 const diffRelatedFormats = {
-  added: ({ name, value: { actual } }, ancestry) => `Property '${ancestry}${name}' was added with value: ${convertValueByType(actual)}`,
+  added: ({ name, actual }, ancestry) => `Property '${ancestry}${name}' was added with value: ${convertValueByType(actual)}`,
   deleted: ({ name }, ancestry) => `Property '${ancestry}${name}' was removed`,
-  changed: ({ name, value: { actual, previous } }, ancestry) => `Property '${ancestry}${name}' was updated. From ${convertValueByType(previous)} to ${convertValueByType(actual)}`,
+  changed: ({ name, actual, previous }, ancestry) => `Property '${ancestry}${name}' was updated. From ${convertValueByType(previous)} to ${convertValueByType(actual)}`,
   unchanged: () => null,
-  nested: (node, ancestry, handleFn) => `${handleFn(node, `${ancestry}${node.name}.`)}`,
+  nested: ({ name, children }, ancestry, handleFn) => `${handleFn(children, `${ancestry}${name}.`)}`,
 };
 
-const formatAsPlain = ({ children }, ancestry = '') => children
+const formatAsPlain = (nodes, ancestry = '') => nodes
   .map((node) => diffRelatedFormats[node.type](node, ancestry, formatAsPlain))
   .filter((v) => v !== null)
   .join('\n');

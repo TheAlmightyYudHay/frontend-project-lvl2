@@ -15,21 +15,15 @@ const buildLine = (name, value, treeDepth, sign) => {
 };
 
 const diffRelatedFormats = {
-  unchanged: ({ name, value: { actual } }, treeDepth) => buildLine(name, actual, treeDepth, null),
-  added: ({ name, value: { actual } }, treeDepth) => buildLine(name, actual, treeDepth, '+'),
-  deleted: ({ name, value: { previous } }, treeDepth) => buildLine(name, previous, treeDepth, '-'),
-  changed: ({ name, value: { previous, actual } }, treeDepth) => `${buildLine(name, actual, treeDepth, '+')}\n${buildLine(name, previous, treeDepth, '-')}`,
-  nested: (node, treeDepth, handleFn) => handleFn(node, treeDepth),
+  unchanged: ({ name, actual }, treeDepth) => buildLine(name, actual, treeDepth, null),
+  added: ({ name, actual }, treeDepth) => buildLine(name, actual, treeDepth, '+'),
+  deleted: ({ name, previous }, treeDepth) => buildLine(name, previous, treeDepth, '-'),
+  changed: ({ name, previous, actual }, treeDepth) => `${buildLine(name, actual, treeDepth, '+')}\n${buildLine(name, previous, treeDepth, '-')}`,
+  nested: ({ name, children }, treeDepth, handleFn) => `${' '.repeat(treeDepth * 4)}${name}: {\n${handleFn(children, treeDepth)}\n${' '.repeat(treeDepth * 4)}}`,
 };
 
-const formatAsObject = (node, treeDepth = 0) => {
-  const { name, children } = node;
-  const formattedName = name ? `${name}: ` : '';
-  const formattedChildren = children.map((child) => diffRelatedFormats[child.type](
-    child, treeDepth + 1, formatAsObject,
-  ))
-    .join('\n');
-  return `${' '.repeat(treeDepth * 4)}${formattedName}{\n${formattedChildren}\n${' '.repeat(treeDepth * 4)}}`;
-};
+const formatAsObject = (nodes, treeDepth = 0) => nodes.map(
+  (child) => diffRelatedFormats[child.type](child, treeDepth + 1, formatAsObject),
+).join('\n');
 
-export default formatAsObject;
+export default (nodes) => `{\n${formatAsObject(nodes)}\n}`;
